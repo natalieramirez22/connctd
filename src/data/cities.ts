@@ -2,70 +2,77 @@ export const cities = [
   {
     id: "seattle",
     name: "seattle",
-    x: 20,
-    y: 30,
+    mapX: 13,
+    mapY: 32,
+    x: 13,
+    y: 32,
     friends: [{ name: "natalie" }],
   },
 
   {
     id: "sf",
     name: "san francisco",
-    x: 12.5,
-    y: 26,
+    mapX: 12.5,
+    mapY: 26,
+    x: 11.5,
+    y: 38,
     friends: [
-        { name: "erika", note: "san jose" },
-        { name: "bella", note: "mountain view" },
+      { name: "erika", note: "san jose" },
+      { name: "bella", note: "mountain view" },
     ],
   },
 
   {
     id: "ann-arbor",
     name: "ann arbor",
-    x: 24,
-    y: 47,
+    mapX: 20,
+    mapY: 47,
+    x: 25,
+    y: 37,
     friends: [
-        { name: "leah", note: "neeeeeeed to visit asap" },
-        { name: "calla" },
-        { name: "anj" },
+      { name: "leah", note: "neeeeeeed to visit asap" },
+      { name: "calla" },
+      { name: "anj" },
     ],
   },
 
   {
     id: "chicago",
     name: "chicago",
-    x: 29,
-    y: 45,
-    friends: [
-        { name: "aran" }
-    ],
+    mapX: 29,
+    mapY: 35,
+    x: 23,
+    y: 34,
+    friends: [{ name: "aran" }],
   },
 
   {
     id: "dc",
     name: "washington d.c.",
-    x: 38,
-    y: 55,
-    friends: [
-        { name: "calvin", note: "working at NIH in bethesda"}
-    ],
+    mapX: 38,
+    mapY: 55,
+    x: 26,
+    y: 43,
+    friends: [{ name: "calvin", note: "working at NIH in bethesda" }],
   },
 
   {
     id: "boston",
     name: "boston",
-    x: 43,
+    mapX: 43,
+    mapY: 40,
+    x: 28,
     y: 40,
-    friends: [
-        { name: "stoat" },
-        { name: "shubh" },
-    ],
+    friends: [{ name: "stoat" }, { name: "shubh" }],
   },
 
   {
     id: "nyc",
     name: "new york city",
-    x: 40,
-    y: 50,
+    mapX: 40,
+    mapY: 50,
+    x: 32,
+    y: 36,
     friends: [
       { name: "isa", note: "roomies with jenny & dishita" },
       { name: "jenny" },
@@ -79,10 +86,15 @@ export const cities = [
   {
     id: "london",
     name: "london",
-    x: 58,
-    y: 37,
+    mapX: 58,
+    mapY: 37,
+    x: 51,
+    y: 34,
     friends: [
-        { name: "annemarie", note: "doing her PhD @ imperial college of london" },
+      {
+        name: "annemarie",
+        note: "doing her PhD @ imperial college of london",
+      },
     ],
   },
 ];
