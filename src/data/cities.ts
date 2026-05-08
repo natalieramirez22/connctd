@@ -94,6 +94,20 @@ export const cities = [
   },
 
   {
+    id: "indy",
+    name: "indy",
+    mapX: 58,
+    mapY: 37,
+    x: 22,
+    y: 41,
+    friends: [
+      {
+        name: "josie",
+      },
+    ],
+  },
+
+  {
     id: "nyc",
     name: "new york city",
     mapX: 40,

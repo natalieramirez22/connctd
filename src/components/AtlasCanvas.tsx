@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { cities } from "../data/cities";
 
@@ -12,28 +12,32 @@ const WORLD_BOUNDS = {
   bottom: 100,
 };
 
+const FOCUS_PADDING_X = 4;
+const FOCUS_PADDING_Y = 5;
+
 export default function AtlasCanvas() {
   const [selectedCity, setSelectedCity] = useState<any>(null);
-
-  // 0 = zoomed into your cities, 1 = full world view
   const [zoomOut, setZoomOut] = useState(0);
+  const [panWorld, setPanWorld] = useState({ x: 0, y: 0 });
 
-  // map panning
-  const [pan, setPan] = useState({ x: 0, y: 0 });
+  const viewportRef = useRef<HTMLDivElement | null>(null);
+  const draggingRef = useRef(false);
+  const movedRef = useRef(false);
+  const lastPointerRef = useRef({ x: 0, y: 0 });
 
   const focusedBounds = useMemo(() => {
     const xs = cities.map((c) => c.mapX ?? c.x);
     const ys = cities.map((c) => c.mapY ?? c.y);
 
     return {
-      left: Math.min(...xs) - 10,
-      right: Math.max(...xs) + 10,
-      top: Math.min(...ys) - 12,
-      bottom: Math.max(...ys) + 12,
+      left: Math.min(...xs) - FOCUS_PADDING_X,
+      right: Math.max(...xs) + FOCUS_PADDING_X,
+      top: Math.min(...ys) - FOCUS_PADDING_Y,
+      bottom: Math.max(...ys) + FOCUS_PADDING_Y,
     };
   }, []);
 
-  const viewBounds = useMemo(() => {
+  const baseBounds = useMemo(() => {
     const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
     return {
@@ -44,28 +48,50 @@ export default function AtlasCanvas() {
     };
   }, [focusedBounds, zoomOut]);
 
+  const viewBounds = useMemo(() => {
+    const width = baseBounds.right - baseBounds.left;
+    const height = baseBounds.bottom - baseBounds.top;
+
+    let left = baseBounds.left + panWorld.x;
+    let top = baseBounds.top + panWorld.y;
+
+    if (width >= 100) {
+      left = 0;
+    } else {
+      left = Math.max(0, Math.min(100 - width, left));
+    }
+
+    if (height >= 100) {
+      top = 0;
+    } else {
+      top = Math.max(0, Math.min(100 - height, top));
+    }
+
+    return {
+      left,
+      right: left + width,
+      top,
+      bottom: top + height,
+    };
+  }, [baseBounds, panWorld]);
+
   const viewWidth = viewBounds.right - viewBounds.left;
   const viewHeight = viewBounds.bottom - viewBounds.top;
 
-  const projectX = (x: number) => {
-    return ((x - viewBounds.left) / viewWidth) * 100;
-  };
-
-  const projectY = (y: number) => {
-    return ((y - viewBounds.top) / viewHeight) * 100;
-  };
+  const projectX = (x: number) => ((x - viewBounds.left) / viewWidth) * 100;
+  const projectY = (y: number) => ((y - viewBounds.top) / viewHeight) * 100;
 
   const zoomIn = () => {
-    setZoomOut((z) => Math.max(0, z - 0.18));
+    setZoomOut((z) => Math.max(0, z - 0.14));
   };
 
   const zoomOutMap = () => {
-    setZoomOut((z) => Math.min(1, z + 0.18));
+    setZoomOut((z) => Math.min(1, z + 0.14));
   };
 
   const resetView = () => {
     setZoomOut(0);
-    setPan({ x: 0, y: 0 });
+    setPanWorld({ x: 0, y: 0 });
   };
 
   const worldLayerStyle = {
@@ -75,55 +101,95 @@ export default function AtlasCanvas() {
     top: `${-(viewBounds.top / viewHeight) * 100}%`,
   };
 
-  return (
-    <div className="relative w-full h-full overflow-hidden bg-[#020617]">
-      <div className="absolute inset-0 bg-[#020617]" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,#11306f_0%,#020617_65%)]" />
+  const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    draggingRef.current = true;
+    movedRef.current = false;
+    lastPointerRef.current = { x: e.clientX, y: e.clientY };
+    e.currentTarget.setPointerCapture(e.pointerId);
+  };
 
-      {/* DRAGGABLE MAP VIEWPORT */}
-      <motion.div
-        className="absolute inset-0 cursor-grab active:cursor-grabbing"
-        drag
-        dragMomentum={false}
-        onDrag={(_, info) => {
-          setPan((prev) => ({
-            x: prev.x + info.delta.x,
-            y: prev.y + info.delta.y,
-          }));
-        }}
-        animate={{
-          x: pan.x,
-          y: pan.y,
-        }}
-        transition={{
-          type: "spring",
-          stiffness: 120,
-          damping: 24,
-        }}
+  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!draggingRef.current) return;
+
+    const rect = viewportRef.current?.getBoundingClientRect();
+    if (!rect) return;
+
+    const dx = e.clientX - lastPointerRef.current.x;
+    const dy = e.clientY - lastPointerRef.current.y;
+
+    if (Math.abs(dx) > 2 || Math.abs(dy) > 2) {
+      movedRef.current = true;
+    }
+
+    lastPointerRef.current = { x: e.clientX, y: e.clientY };
+
+    const worldDx = -(dx / rect.width) * viewWidth;
+    const worldDy = -(dy / rect.height) * viewHeight;
+
+    setPanWorld((prev) => ({
+      x: prev.x + worldDx,
+      y: prev.y + worldDy,
+    }));
+  };
+
+  const handlePointerUp = () => {
+    draggingRef.current = false;
+
+    if (!movedRef.current) {
+      setSelectedCity(null);
+    }
+  };
+
+  return (
+    <div className="relative w-full h-full overflow-hidden bg-[#01040d]">
+      <div className="absolute inset-0 bg-[#01040d]" />
+
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,#0d2a66_0%,#01040d_68%)]" />
+
+      {/* MAP VIEWPORT */}
+      <div
+        ref={viewportRef}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        className="absolute inset-0 overflow-hidden cursor-grab active:cursor-grabbing"
       >
-        {/* MAP */}
+        {/* CONTINENT GLOW UNDERLAY */}
         <motion.div
-          className="absolute opacity-[0.62]"
+          className="absolute opacity-[0.42] pointer-events-none"
           animate={worldLayerStyle}
           transition={{ type: "spring", stiffness: 90, damping: 24 }}
           style={{
             backgroundImage: MAP_IMAGE,
             backgroundRepeat: "no-repeat",
             backgroundSize: "100% 100%",
-            filter: "brightness(2.2) contrast(1.35) saturate(0)",
+            filter: "brightness(3.2) contrast(1.8) saturate(0) blur(4px)",
           }}
         />
 
-        {/* MAP GLOW */}
+        {/* MAIN MAP, LIGHTER LAND */}
         <motion.div
-          className="absolute opacity-[0.28]"
+          className="absolute opacity-[0.76] pointer-events-none"
           animate={worldLayerStyle}
           transition={{ type: "spring", stiffness: 90, damping: 24 }}
           style={{
             backgroundImage: MAP_IMAGE,
             backgroundRepeat: "no-repeat",
             backgroundSize: "100% 100%",
-            filter: "brightness(3) contrast(1.6) blur(3px)",
+            filter: "brightness(2.75) contrast(1.55) saturate(0)",
+          }}
+        />
+
+        {/* SUBTLE MAP SHARPNESS LAYER */}
+        <motion.div
+          className="absolute opacity-[0.16] pointer-events-none mix-blend-screen"
+          animate={worldLayerStyle}
+          transition={{ type: "spring", stiffness: 90, damping: 24 }}
+          style={{
+            backgroundImage: MAP_IMAGE,
+            backgroundRepeat: "no-repeat",
+            backgroundSize: "100% 100%",
+            filter: "brightness(4) contrast(2.2) saturate(0)",
           }}
         />
 
@@ -142,6 +208,7 @@ export default function AtlasCanvas() {
             <motion.button
               key={city.id}
               type="button"
+              onPointerDown={(e) => e.stopPropagation()}
               onClick={(e) => {
                 e.stopPropagation();
                 if (active) setSelectedCity(city);
@@ -223,8 +290,8 @@ export default function AtlasCanvas() {
                   <div
                     className={`mt-1 ${
                       active
-                        ? "text-white/38 text-[13px]"
-                        : "text-white/20 text-[13px]"
+                        ? "text-white/42 text-[13px]"
+                        : "text-white/22 text-[13px]"
                     }`}
                   >
                     {friendCount} friend{friendCount !== 1 ? "s" : ""}
@@ -234,16 +301,16 @@ export default function AtlasCanvas() {
             </motion.button>
           );
         })}
-      </motion.div>
+      </div>
 
-      <div className="absolute inset-0 bg-blue-500/[0.10] pointer-events-none" />
+      <div className="absolute inset-0 bg-blue-500/[0.07] pointer-events-none" />
 
       <div
-        className="absolute inset-0 opacity-[0.05] pointer-events-none"
+        className="absolute inset-0 opacity-[0.055] pointer-events-none"
         style={{
           backgroundImage: `
-            linear-gradient(to right, rgba(255,255,255,0.06) 1px, transparent 1px),
-            linear-gradient(to bottom, rgba(255,255,255,0.06) 1px, transparent 1px)
+            linear-gradient(to right, rgba(255,255,255,0.07) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(255,255,255,0.07) 1px, transparent 1px)
           `,
           backgroundSize: "160px 160px",
         }}
@@ -261,14 +328,14 @@ export default function AtlasCanvas() {
         className="absolute right-[-15%] bottom-[-20%] w-[850px] h-[850px] bg-purple-500/10 blur-3xl rounded-full pointer-events-none"
       />
 
-      <div className="absolute inset-0 bg-black/10 pointer-events-none" />
+      <div className="absolute inset-0 bg-black/06 pointer-events-none" />
 
       {/* TITLE */}
       <div className="absolute top-7 left-7 z-40 pointer-events-none">
         <h1 className="text-5xl font-semibold tracking-tight text-white leading-none">
           connctd
         </h1>
-        <p className="text-white/38 mt-2 text-base">post-grad social atlas</p>
+        <p className="text-white/42 mt-2 text-base">post-grad social atlas</p>
       </div>
 
       {/* ZOOM CONTROLS */}
