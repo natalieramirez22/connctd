@@ -23,6 +23,18 @@ export const cities = [
   },
 
   {
+    id: "vegas",
+    name: "las vegas",
+    mapX: 12.5,
+    mapY: 26,
+    x: 15,
+    y: 43,
+    friends: [
+      { name: "jasmine" },
+    ],
+  },
+
+  {
     id: "ann-arbor",
     name: "ann arbor",
     mapX: 20,
@@ -52,7 +64,7 @@ export const cities = [
     mapX: 38,
     mapY: 55,
     x: 26,
-    y: 43,
+    y: 47,
     friends: [{ name: "calvin", note: "working at NIH in bethesda" }],
   },
 
@@ -61,9 +73,24 @@ export const cities = [
     name: "boston",
     mapX: 43,
     mapY: 40,
-    x: 28,
-    y: 40,
+    x: 31,
+    y: 39,
     friends: [{ name: "stoat" }, { name: "shubh" }],
+  },
+
+  {
+    id: "connecticut",
+    name: "connecticut",
+    mapX: 58,
+    mapY: 37,
+    x: 27,
+    y: 43,
+    friends: [
+      {
+        name: "ansh",
+        note: "originally from ct also",
+      },
+    ],
   },
 
   {
@@ -71,15 +98,17 @@ export const cities = [
     name: "new york city",
     mapX: 40,
     mapY: 50,
-    x: 32,
-    y: 36,
+    x: 33,
+    y: 34,
     friends: [
       { name: "isa", note: "roomies with jenny & dishita" },
       { name: "jenny" },
-      { name: "sab", note: "originally from NYC too" },
+      { name: "sab", note: "originally from NYC also" },
       { name: "dishita" },
       { name: "anna" },
       { name: "leela" },
+      { name: "grace b" },
+      { name: "neha" },
     ],
   },
 
