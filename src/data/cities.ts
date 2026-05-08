@@ -1,88 +1,88 @@
 export const cities = [
   {
     id: "seattle",
-    name: "Seattle",
-    x: 14,
-    y: 20,
-    friends: [{ name: "Natalie" }],
+    name: "seattle",
+    x: 20,
+    y: 30,
+    friends: [{ name: "natalie" }],
   },
 
   {
     id: "sf",
-    name: "San Francisco",
+    name: "san francisco",
     x: 12.5,
     y: 26,
     friends: [
-        { name: "Erika", note: "San Jose" },
-        { name: "Bella", note: "Mountain View" },
+        { name: "erika", note: "san jose" },
+        { name: "bella", note: "mountain view" },
     ],
   },
 
   {
     id: "ann-arbor",
-    name: "Ann Arbor",
+    name: "ann arbor",
     x: 24,
     y: 47,
     friends: [
-        { name: "Leah", note: "neeeeeeed to visit" },
-        { name: "Calla" },
-        { name: "Anj" },
+        { name: "leah", note: "neeeeeeed to visit asap" },
+        { name: "calla" },
+        { name: "anj" },
     ],
   },
 
   {
     id: "chicago",
-    name: "Chicago",
+    name: "chicago",
     x: 29,
     y: 45,
     friends: [
-        { name: "Aran" }
+        { name: "aran" }
     ],
   },
 
   {
     id: "dc",
-    name: "Washington D.C.",
+    name: "washington d.c.",
     x: 38,
     y: 55,
     friends: [
-        { name: "Calvin", note: "Working at NIH in Bethesda"}
+        { name: "calvin", note: "working at NIH in bethesda"}
     ],
   },
 
   {
     id: "boston",
-    name: "Boston",
+    name: "boston",
     x: 43,
     y: 40,
     friends: [
-        { name: "Stoat" },
-        { name: "Shubh" },
+        { name: "stoat" },
+        { name: "shubh" },
     ],
   },
 
   {
     id: "nyc",
-    name: "New York City",
+    name: "new york city",
     x: 40,
     y: 50,
     friends: [
-      { name: "Isa", note: "Roomies with Jenny & Dishita" },
-      { name: "Jenny" },
-      { name: "Sab", note: "originally from NYC too" },
-      { name: "Dishita" },
-      { name: "Anna" },
-      { name: "Leela" },
+      { name: "isa", note: "roomies with jenny & dishita" },
+      { name: "jenny" },
+      { name: "sab", note: "originally from NYC too" },
+      { name: "dishita" },
+      { name: "anna" },
+      { name: "leela" },
     ],
   },
 
   {
     id: "london",
-    name: "London",
+    name: "london",
     x: 58,
     y: 37,
     friends: [
-        { name: "Annemarie", note: "Doing her PhD @ Imperial College of London" },
+        { name: "annemarie", note: "doing her PhD @ imperial college of london" },
     ],
   },
 ];

@@ -1,41 +1,119 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { cities } from "../data/cities";
 
 export default function AtlasCanvas() {
   const [selectedCity, setSelectedCity] = useState<any>(null);
 
+  /*
+    DYNAMIC MAP BOUNDS
+
+    Instead of showing the entire world,
+    automatically frame ONLY the region where
+    the user's cities exist.
+
+    This creates the "living atlas" effect:
+    - mostly US cities -> zoom into North America
+    - add Europe -> widen slightly
+    - add Asia -> zoom out further
+  */
+
+  const bounds = useMemo(() => {
+    const xs = cities.map((c) => c.x);
+    const ys = cities.map((c) => c.y);
+
+    const minX = Math.min(...xs);
+    const maxX = Math.max(...xs);
+
+    const minY = Math.min(...ys);
+    const maxY = Math.max(...ys);
+
+    /*
+      padding around the outer cities
+    */
+    const paddingX = 10;
+    const paddingY = 12;
+
+    return {
+      left: minX - paddingX,
+      right: maxX + paddingX,
+      top: minY - paddingY,
+      bottom: maxY + paddingY,
+    };
+  }, []);
+
+  /*
+    Convert "world coordinates"
+    into viewport coordinates dynamically
+  */
+
+  const projectX = (x: number) => {
+    return (
+      ((x - bounds.left) /
+        (bounds.right - bounds.left)) *
+      100
+    );
+  };
+
+  const projectY = (y: number) => {
+    return (
+      ((y - bounds.top) /
+        (bounds.bottom - bounds.top)) *
+      100
+    );
+  };
+
   return (
     <div className="relative w-full h-full overflow-hidden bg-[#020617]">
-      {/* DARK OCEAN BACKGROUND */}
+      {/* BACKGROUND */}
       <div className="absolute inset-0 bg-[#020617]" />
 
       {/* DEEP BLUE GRADIENT */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,#0f2d70_0%,#020617_65%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,#11306f_0%,#020617_65%)]" />
 
-      {/* MAIN MAP */}
-      <div
-        className="absolute inset-0 opacity-[0.58]"
+      {/* DYNAMIC MAP */}
+      <motion.div
+        className="absolute inset-0 opacity-[0.60]"
         style={{
           backgroundImage:
             "url('https://upload.wikimedia.org/wikipedia/commons/8/80/World_map_-_low_resolution.svg')",
           backgroundRepeat: "no-repeat",
-          backgroundPosition: "center center",
-          backgroundSize: "1550px",
+
+          /*
+            IMPORTANT:
+            the map is intentionally HUGE now.
+            We "move" it underneath the viewport
+            instead of viewing the entire world.
+          */
+          backgroundSize: "2600px",
+
+          /*
+            center map based on city distribution
+          */
+          backgroundPosition: `
+            ${50 - (bounds.left + bounds.right) / 2}%
+            ${60 - (bounds.top + bounds.bottom) / 2}%
+          `,
+
           filter:
             "brightness(2.2) contrast(1.35) saturate(0)",
         }}
       />
 
-      {/* SOFT CONTINENT GLOW */}
-      <div
+      {/* MAP GLOW */}
+      <motion.div
         className="absolute inset-0 opacity-[0.30]"
         style={{
           backgroundImage:
             "url('https://upload.wikimedia.org/wikipedia/commons/8/80/World_map_-_low_resolution.svg')",
           backgroundRepeat: "no-repeat",
-          backgroundPosition: "center center",
-          backgroundSize: "1550px",
+          backgroundSize: "2600px",
+
+          backgroundPosition: `
+            ${50 - (bounds.left + bounds.right) / 2}%
+            ${60 - (bounds.top + bounds.bottom) / 2}%
+          `,
+
           filter:
             "brightness(3) contrast(1.6) blur(3px)",
         }}
@@ -43,6 +121,18 @@ export default function AtlasCanvas() {
 
       {/* BLUE ATMOSPHERIC TINT */}
       <div className="absolute inset-0 bg-blue-500/[0.10]" />
+
+      {/* GRID */}
+      <div
+        className="absolute inset-0 opacity-[0.05]"
+        style={{
+          backgroundImage: `
+            linear-gradient(to right, rgba(255,255,255,0.06) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(255,255,255,0.06) 1px, transparent 1px)
+          `,
+          backgroundSize: "160px 160px",
+        }}
+      />
 
       {/* LEFT BLUE AMBIENT */}
       <motion.div
@@ -70,19 +160,7 @@ export default function AtlasCanvas() {
         className="absolute right-[-15%] bottom-[-20%] w-[850px] h-[850px] bg-purple-500/10 blur-3xl rounded-full"
       />
 
-      {/* GRID */}
-      <div
-        className="absolute inset-0 opacity-[0.055]"
-        style={{
-          backgroundImage: `
-            linear-gradient(to right, rgba(255,255,255,0.06) 1px, transparent 1px),
-            linear-gradient(to bottom, rgba(255,255,255,0.06) 1px, transparent 1px)
-          `,
-          backgroundSize: "160px 160px",
-        }}
-      />
-
-      {/* SUBTLE DARK VIGNETTE */}
+      {/* VIGNETTE */}
       <div className="absolute inset-0 bg-black/10" />
 
       {/* TITLE */}
@@ -133,8 +211,8 @@ export default function AtlasCanvas() {
             }}
             className="absolute z-30"
             style={{
-              left: `${city.x}%`,
-              top: `${city.y}%`,
+              left: `${projectX(city.x)}%`,
+              top: `${projectY(city.y)}%`,
               x: "-50%",
               y: "-50%",
             }}
@@ -174,8 +252,7 @@ export default function AtlasCanvas() {
             {/* OUTER RING */}
             <div
               className={`
-                absolute rounded-full
-                border
+                absolute rounded-full border
                 ${
                   isSelected
                     ? "border-blue-200"
@@ -209,7 +286,12 @@ export default function AtlasCanvas() {
             />
 
             {/* LABEL */}
-            <div className="absolute left-8 top-1/2 -translate-y-1/2 whitespace-nowrap text-left">
+            <div
+              className="absolute top-1/2 -translate-y-1/2 whitespace-nowrap text-left"
+              style={{
+                left: ringSize / 2 + 22,
+              }}
+            >
               <div
                 className={`
                   font-medium tracking-tight leading-none
