@@ -7,25 +7,68 @@ export default function AtlasCanvas() {
 
   return (
     <div className="relative w-full h-full overflow-hidden bg-[#020617]">
-      {/* BACKGROUND */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,#0f245d_0%,#020617_58%)]" />
+      {/* DARK OCEAN BACKGROUND */}
+      <div className="absolute inset-0 bg-[#020617]" />
 
-      {/* MAP */}
+      {/* DEEP BLUE GRADIENT */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,#0f2d70_0%,#020617_65%)]" />
+
+      {/* MAIN MAP */}
       <div
-        className="absolute inset-0 opacity-[0.38]"
+        className="absolute inset-0 opacity-[0.58]"
         style={{
           backgroundImage:
             "url('https://upload.wikimedia.org/wikipedia/commons/8/80/World_map_-_low_resolution.svg')",
           backgroundRepeat: "no-repeat",
           backgroundPosition: "center center",
-          backgroundSize: "1650px",
+          backgroundSize: "1550px",
           filter:
-            "brightness(0.95) contrast(1.45) saturate(0) blur(0px)",
+            "brightness(2.2) contrast(1.35) saturate(0)",
         }}
       />
 
-      {/* MAP GLOW */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_40%,rgba(59,130,246,0.18),transparent_35%),radial-gradient(circle_at_75%_55%,rgba(168,85,247,0.12),transparent_40%)]" />
+      {/* SOFT CONTINENT GLOW */}
+      <div
+        className="absolute inset-0 opacity-[0.30]"
+        style={{
+          backgroundImage:
+            "url('https://upload.wikimedia.org/wikipedia/commons/8/80/World_map_-_low_resolution.svg')",
+          backgroundRepeat: "no-repeat",
+          backgroundPosition: "center center",
+          backgroundSize: "1550px",
+          filter:
+            "brightness(3) contrast(1.6) blur(3px)",
+        }}
+      />
+
+      {/* BLUE ATMOSPHERIC TINT */}
+      <div className="absolute inset-0 bg-blue-500/[0.10]" />
+
+      {/* LEFT BLUE AMBIENT */}
+      <motion.div
+        animate={{
+          opacity: [0.14, 0.22, 0.14],
+        }}
+        transition={{
+          duration: 8,
+          repeat: Infinity,
+          ease: "easeInOut",
+        }}
+        className="absolute left-[-8%] top-[-10%] w-[900px] h-[900px] bg-blue-500/14 blur-3xl rounded-full"
+      />
+
+      {/* RIGHT PURPLE AMBIENT */}
+      <motion.div
+        animate={{
+          opacity: [0.08, 0.16, 0.08],
+        }}
+        transition={{
+          duration: 10,
+          repeat: Infinity,
+          ease: "easeInOut",
+        }}
+        className="absolute right-[-15%] bottom-[-20%] w-[850px] h-[850px] bg-purple-500/10 blur-3xl rounded-full"
+      />
 
       {/* GRID */}
       <div
@@ -39,16 +82,16 @@ export default function AtlasCanvas() {
         }}
       />
 
-      {/* DARK OVERLAY */}
-      <div className="absolute inset-0 bg-black/28" />
+      {/* SUBTLE DARK VIGNETTE */}
+      <div className="absolute inset-0 bg-black/10" />
 
       {/* TITLE */}
-      <div className="absolute top-8 left-8 z-40">
-        <h1 className="text-7xl font-semibold tracking-tight text-white leading-none">
+      <div className="absolute top-7 left-7 z-40">
+        <h1 className="text-5xl font-semibold tracking-tight text-white leading-none">
           connctd
         </h1>
 
-        <p className="text-white/40 mt-3 text-xl">
+        <p className="text-white/38 mt-2 text-base">
           post-grad social atlas
         </p>
       </div>
@@ -60,11 +103,11 @@ export default function AtlasCanvas() {
         const active = friendCount > 0;
 
         const coreSize = active
-          ? 16 + Math.min(friendCount * 2, 10)
+          ? 15 + Math.min(friendCount * 2, 10)
           : 10;
 
         const glowSize = active
-          ? 52 + friendCount * 10
+          ? 60 + friendCount * 10
           : 28;
 
         const ringSize = coreSize + 14;
@@ -81,7 +124,7 @@ export default function AtlasCanvas() {
                 : null
             }
             whileHover={{
-              scale: 1.08,
+              scale: 1.05,
             }}
             transition={{
               type: "spring",
@@ -96,12 +139,12 @@ export default function AtlasCanvas() {
               y: "-50%",
             }}
           >
-            {/* GLOW */}
+            {/* NODE GLOW */}
             <motion.div
               animate={{
                 opacity: active
-                  ? [0.18, 0.42, 0.18]
-                  : [0.05, 0.12, 0.05],
+                  ? [0.12, 0.3, 0.12]
+                  : [0.03, 0.08, 0.03],
 
                 scale: [1, 1.08, 1],
               }}
@@ -114,7 +157,7 @@ export default function AtlasCanvas() {
                 absolute rounded-full blur-2xl
                 ${
                   active
-                    ? "bg-blue-500/55"
+                    ? "bg-blue-500/50"
                     : "bg-white/10"
                 }
               `}
@@ -131,11 +174,12 @@ export default function AtlasCanvas() {
             {/* OUTER RING */}
             <div
               className={`
-                absolute rounded-full border
+                absolute rounded-full
+                border
                 ${
                   isSelected
                     ? "border-blue-200"
-                    : "border-white/70"
+                    : "border-white/65"
                 }
               `}
               style={{
@@ -148,7 +192,7 @@ export default function AtlasCanvas() {
               }}
             />
 
-            {/* INNER DOT */}
+            {/* CORE */}
             <div
               className={`
                 relative rounded-full
@@ -171,8 +215,8 @@ export default function AtlasCanvas() {
                   font-medium tracking-tight leading-none
                   ${
                     active
-                      ? "text-white text-[16px]"
-                      : "text-white/55 text-[15px]"
+                      ? "text-white text-[17px]"
+                      : "text-white/50 text-[15px]"
                   }
                 `}
               >
@@ -184,7 +228,7 @@ export default function AtlasCanvas() {
                   mt-1
                   ${
                     active
-                      ? "text-white/40 text-[13px]"
+                      ? "text-white/38 text-[13px]"
                       : "text-white/20 text-[13px]"
                   }
                 `}
@@ -216,20 +260,20 @@ export default function AtlasCanvas() {
             transition={{
               duration: 0.35,
             }}
-            className="absolute top-0 right-0 h-full w-[420px] border-l border-white/10 bg-[#07101d]/92 backdrop-blur-3xl z-50"
+            className="absolute top-0 right-0 h-full w-[410px] border-l border-white/10 bg-[#07101d]/92 backdrop-blur-3xl z-50"
           >
-            {/* PURPLE SIDE GLOW */}
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom,rgba(168,85,247,0.12),transparent_45%)]" />
+            {/* PANEL GLOW */}
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom,rgba(168,85,247,0.10),transparent_45%)]" />
 
-            <div className="relative p-10">
+            <div className="relative p-9">
               {/* HEADER */}
               <div className="flex items-start justify-between">
                 <div>
-                  <h2 className="text-5xl font-semibold text-white leading-none">
+                  <h2 className="text-[40px] font-semibold text-white leading-none">
                     {selectedCity.name}
                   </h2>
 
-                  <p className="text-white/35 mt-4 text-lg">
+                  <p className="text-white/35 mt-3 text-base">
                     {selectedCity.friends.length} friends
                   </p>
                 </div>
@@ -238,13 +282,13 @@ export default function AtlasCanvas() {
                   onClick={() =>
                     setSelectedCity(null)
                   }
-                  className="text-white/30 hover:text-white transition text-3xl"
+                  className="text-white/30 hover:text-white transition text-2xl"
                 >
                   ×
                 </button>
               </div>
 
-              {/* FRIEND LIST */}
+              {/* FRIEND CARDS */}
               <div className="mt-10 flex flex-col gap-4">
                 {selectedCity.friends.map(
                   (friend: any, index: number) => (
@@ -261,22 +305,22 @@ export default function AtlasCanvas() {
                       transition={{
                         delay: index * 0.04,
                       }}
-                      className="rounded-3xl border border-white/10 bg-white/[0.03] px-5 py-5 hover:bg-white/[0.05] transition"
+                      className="rounded-3xl border border-white/10 bg-white/[0.03] px-5 py-4 hover:bg-white/[0.05] transition"
                     >
                       <div className="flex items-center justify-between">
                         <div>
-                          <h3 className="text-[28px] leading-none text-white font-medium">
+                          <h3 className="text-[22px] leading-none text-white font-medium">
                             {friend.name}
                           </h3>
 
                           {friend.note && (
-                            <p className="text-white/30 mt-2 text-sm">
+                            <p className="text-white/30 mt-2 text-[13px]">
                               {friend.note}
                             </p>
                           )}
                         </div>
 
-                        <div className="w-3.5 h-3.5 rounded-full bg-green-400 shadow-[0_0_18px_rgba(74,222,128,0.95)]" />
+                        <div className="w-3 h-3 rounded-full bg-green-400 shadow-[0_0_14px_rgba(74,222,128,0.95)]" />
                       </div>
                     </motion.div>
                   )

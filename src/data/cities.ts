@@ -2,16 +2,16 @@ export const cities = [
   {
     id: "seattle",
     name: "Seattle",
-    x: 11,
-    y: 38,
+    x: 14,
+    y: 20,
     friends: [{ name: "Natalie" }],
   },
 
   {
     id: "sf",
     name: "San Francisco",
-    x: 8,
-    y: 52,
+    x: 12.5,
+    y: 26,
     friends: [
         { name: "Erika", note: "San Jose" },
         { name: "Bella", note: "Mountain View" },
@@ -24,7 +24,7 @@ export const cities = [
     x: 24,
     y: 47,
     friends: [
-        { name: "Leah" },
+        { name: "Leah", note: "neeeeeeed to visit" },
         { name: "Calla" },
         { name: "Anj" },
     ],
